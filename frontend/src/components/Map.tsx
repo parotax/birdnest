@@ -6,7 +6,7 @@ const Map = () => {
 
   const getDrones = async () => {
     const data = await (
-      await fetch("http://localhost:8080/api/dronePositions")
+      await fetch("https://birdnest-backend.fly.dev/api/dronePositions")
     ).json();
 
     setPos(data);
