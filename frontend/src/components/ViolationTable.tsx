@@ -29,7 +29,7 @@ const ViolationTable = () => {
 
   const getDrones = async () => {
     const data = await (
-      await fetch("https://birdnest-backend.fly.dev/violatingDrones")
+      await fetch("https://birdnest-backend.fly.dev/api/violatingDrones")
     ).json();
 
     setViolators(data);
