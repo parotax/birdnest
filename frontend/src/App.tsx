@@ -1,7 +1,8 @@
+import Map from "./map";
 import "./styles.css";
 
 const App = () => {
-  return <div>Hello World!</div>;
+  return <Map />;
 };
 
 export default App;

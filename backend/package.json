@@ -1,5 +1,5 @@
 {
-  "name": "birdnest",
+  "name": "birdnest-backend",
   "version": "1.0.0",
   "description": "Backend for Reaktor pre-assignment",
   "main": "index.js",
