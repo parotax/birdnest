@@ -26,31 +26,35 @@ const getDrones = () => {
       dronePositions.length = 0;
       res.on("data", (chunk) => (data += chunk));
       res.on("end", () => {
-        convert
-          .xml2js(data, { compact: true })
-          .report.capture.drone.forEach((drone) => {
-            // Replace old drone positions with current positions.
-            dronePositions.push({
-              x: drone.positionX._text,
-              y: drone.positionY._text,
-            });
+        try {
+          convert
+            .xml2js(data, { compact: true })
+            .report.capture.drone.forEach((drone) => {
+              // Replace old drone positions with current positions.
+              dronePositions.push({
+                x: drone.positionX._text,
+                y: drone.positionY._text,
+              });
 
-            // Check if the drone is violating the no-fly zone.
-            if (checkViolation(drone)) {
-              // If the drone is already in the violatingDrones list, update its information.
-              if (
-                violatingDrones.filter(
-                  (element) =>
-                    element.serialNumber._text === drone.serialNumber._text
-                ).length > 0
-              ) {
-                updateViolatingDrone(drone);
-              } else {
-                // If the drone is not in the violatingDrones list, add it.
-                addViolatingDrone(drone);
+              // Check if the drone is violating the no-fly zone.
+              if (checkViolation(drone)) {
+                // If the drone is already in the violatingDrones list, update its information.
+                if (
+                  violatingDrones.some(
+                    (element) =>
+                      element.serialNumber === drone.serialNumber._text
+                  )
+                ) {
+                  updateViolatingDrone(drone);
+                } else {
+                  // If the drone is not in the violatingDrones list, add it.
+                  addViolatingDrone(drone);
+                }
               }
-            }
-          });
+            });
+        } catch {
+          console.log("invalid drone data");
+        }
       });
     })
     .on("error", (error) => {
@@ -65,13 +69,13 @@ const updateViolatingDrone = (drone) => {
   // Update the closest distance of the drone to the nest if necessary.
   if (
     drone.closestToNest >
-    pythagoras(drone.positionX, drone.positionY, 250000, 250000)
+    pythagoras(250000, 250000, drone.positionX._text, drone.positionY._text)
   ) {
     drone.closestToNest = pythagoras(
-      drone.positionX,
-      drone.positionY,
       250000,
-      250000
+      250000,
+      drone.positionX._text,
+      drone.positionY._text
     );
   }
 
@@ -87,7 +91,12 @@ const updateViolatingDrone = (drone) => {
 const addViolatingDrone = (drone) => {
   const violatingDrone = {
     lastViolation: Date.now(),
-    closestToNest: pythagoras(drone.positionX, drone.positionY, 250000, 250000),
+    closestToNest: pythagoras(
+      250000,
+      250000,
+      drone.positionX._text,
+      drone.positionY._text
+    ),
     serialNumber: drone.serialNumber._text,
   };
 
@@ -115,7 +124,10 @@ const addViolatingDrone = (drone) => {
 
 // Function for checking if drone is violating the NDZ.
 const checkViolation = (drone) => {
-  if (pythagoras(drone.positionX, drone.positionY, 250000, 250000) < 100000) {
+  if (
+    pythagoras(250000, 250000, drone.positionX._text, drone.positionY._text) <
+    100000
+  ) {
     return true;
   } else {
     return false;
@@ -125,7 +137,7 @@ const checkViolation = (drone) => {
 // Function for removing drone from violatingDrones list after being there for 10 minutes.
 const removeOutdated = () => {
   for (let i = 0; i < violatingDrones.length; i++) {
-    if (Date.now() - violatingDrones[i].lastViolation < 600000) {
+    if (Date.now() - violatingDrones[i].lastViolation > 600000) {
       violatingDrones.splice(i, 1);
       i--;
     }
