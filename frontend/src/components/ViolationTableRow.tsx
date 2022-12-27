@@ -34,7 +34,7 @@ const ViolationTableRow = (props: Props) => {
         <TableCell>
           <IconButton aria-label="expand row" size="small"></IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
+        <TableCell component="th" scope="row" align="center">
           {props.violator.firstName + " " + props.violator.lastName}
         </TableCell>
         <TableCell align="center">{props.violator.email}</TableCell>

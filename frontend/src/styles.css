@@ -18,3 +18,8 @@ body {
   justify-content: center;
   font-size: larger;
 }
+
+.table {
+  width: 100vw;
+  padding: 0 10vw;
+}

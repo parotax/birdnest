@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 
 import { useEffect, useState } from "react";
 import ViolationTableRow from "./ViolationTableRow";
+import "../styles.css";
 
 interface Violator {
   pilotId: string;
@@ -29,7 +30,7 @@ const ViolationTable = () => {
 
   const getDrones = async () => {
     const data = await (
-      await fetch("https://birdnest-backend.fly.dev/api/violatingDrones")
+      await fetch("http://localhost:8080/api/violatingDrones")
     ).json();
 
     setViolators(data);
@@ -45,30 +46,32 @@ const ViolationTable = () => {
   }, []);
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            <TableCell>
-              <IconButton aria-label="expand row" size="small"></IconButton>
-            </TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell align="center">E-mail</TableCell>
-            <TableCell align="center">Phone number</TableCell>
-            <TableCell align="center">Closest distance to nest</TableCell>
-            <TableCell align="center">Last violation</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {violators
-            .slice(0)
-            .reverse()
-            .map((violator) => (
-              <ViolationTableRow key={key++} violator={violator} />
-            ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <div className="table">
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell>
+                <IconButton aria-label="expand row" size="small"></IconButton>
+              </TableCell>
+              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">E-mail</TableCell>
+              <TableCell align="center">Phone number</TableCell>
+              <TableCell align="center">Closest distance to nest</TableCell>
+              <TableCell align="center">Last violation</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {violators
+              .slice(0)
+              .reverse()
+              .map((violator) => (
+                <ViolationTableRow key={key++} violator={violator} />
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 };
 

@@ -64,14 +64,17 @@ const getDrones = () => {
 
 // Function to update violating drone in violatingDrones
 const updateViolatingDrone = (drone) => {
-  drone.lastViolation = Date.now();
+  const violatingDrone = { lastViolation: Date.now() };
+  const oldDrone = violatingDrones.filter(
+    (element) => element.serialNumber === drone.serialNumber._text
+  )[0];
 
   // Update the closest distance of the drone to the nest if necessary.
   if (
-    drone.closestToNest >
+    oldDrone.closestToNest >
     pythagoras(250000, 250000, drone.positionX._text, drone.positionY._text)
   ) {
-    drone.closestToNest = pythagoras(
+    violatingDrone.closestToNest = pythagoras(
       250000,
       250000,
       drone.positionX._text,
@@ -79,12 +82,7 @@ const updateViolatingDrone = (drone) => {
     );
   }
 
-  Object.assign(
-    violatingDrones.filter(
-      (element) => element.serialNumber._text === drone.serialNumber._text
-    ),
-    drone
-  );
+  Object.assign(oldDrone, violatingDrone);
 };
 
 // Function to add violating drone to violatingDrones.
