@@ -37,19 +37,20 @@ const getDrones = () => {
               });
 
               // Check if the drone is violating the no-fly zone.
-              if (checkViolation(drone)) {
+              if (!checkViolation(drone)) {
+                return;
+              }
+
+              if (
+                violatingDrones.some(
+                  (d) => d.serialNumber === drone.serialNumber._text
+                )
+              ) {
                 // If the drone is already in the violatingDrones list, update its information.
-                if (
-                  violatingDrones.some(
-                    (element) =>
-                      element.serialNumber === drone.serialNumber._text
-                  )
-                ) {
-                  updateViolatingDrone(drone);
-                } else {
-                  // If the drone is not in the violatingDrones list, add it.
-                  addViolatingDrone(drone);
-                }
+                updateViolatingDrone(drone);
+              } else {
+                // If the drone is not in the violatingDrones list, add it.
+                addViolatingDrone(drone);
               }
             });
         } catch {
@@ -102,14 +103,13 @@ const addViolatingDrone = (drone) => {
     `https://assignments.reaktor.com/birdnest/pilots/${drone.serialNumber._text}`
   )
     .then((response) => {
-      if (response.status === 404) {
-        console.log(
-          "Pilot not found for serial number",
-          drone.serialNumber._text
-        );
-      } else {
+      if (response.status !== 404) {
         return response.json();
       }
+      console.log(
+        "Pilot not found for serial number",
+        drone.serialNumber._text
+      );
     })
     .then((data) => {
       Object.assign(data, violatingDrone);
@@ -122,14 +122,10 @@ const addViolatingDrone = (drone) => {
 
 // Function for checking if drone is violating the NDZ.
 const checkViolation = (drone) => {
-  if (
+  return (
     pythagoras(250000, 250000, drone.positionX._text, drone.positionY._text) <
     100000
-  ) {
-    return true;
-  } else {
-    return false;
-  }
+  );
 };
 
 // Function for removing drone from violatingDrones list after being there for 10 minutes.
